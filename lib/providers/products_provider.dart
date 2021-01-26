@@ -59,9 +59,30 @@ class ProductsProvider with ChangeNotifier {
 
   /// Adds a new product to the list
   void addProduct(Product product) {
-    _products.add(product);
+    final newProduct = Product(
+      id: DateTime.now().toString(),
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+    );
+    _products.add(newProduct);
     // This is to be called at the end to notify listers that new data is avaliable
     // That also causes the widget that has the lister to rebuild itself
+    notifyListeners();
+  }
+
+  void updateProduct(String id, Product newProduct) {
+    final productIndex = _products.indexWhere((prod) => prod.id == id);
+    if (productIndex >= 0) {
+      _products[productIndex] = newProduct;
+      notifyListeners();
+    } else
+      print("...");
+  }
+
+  void deleteProduct(String id) {
+    _products.removeWhere((element) => element.id == id);
     notifyListeners();
   }
 }
