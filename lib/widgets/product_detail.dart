@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/product.dart';
+import '../providers/product.dart';
 
 class ProductDetail extends StatelessWidget {
   final Product product;
@@ -16,6 +16,8 @@ class ProductDetail extends StatelessWidget {
             product.imageUrl,
             fit: BoxFit.cover,
           ),
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height * 0.50,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

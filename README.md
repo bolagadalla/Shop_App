@@ -5,7 +5,11 @@ Creating a shop app with products and products categories. Also creating shoppin
 ## What I Learned:
 	-[x] More Widgets & UI Patterns!
 	-[x] Provider
-    -[ ] Managing State Efficiently
+  -[x] Managing State Efficiently
+  -[x] Showing Dialog & Snackbars
+  -[x] Fetching User Input via Forms
+  -[ ] Input Validation
+  
 	
 ## How The App Looks
 <p align="center">

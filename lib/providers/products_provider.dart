@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/product.dart';
+import 'product.dart';
 
 // The ChangeNotifier is in charge of notifying listers when data has changed
 // The lister must be at the highest point of the widget tree where you will start listening for new data
@@ -42,11 +42,19 @@ class ProductsProvider with ChangeNotifier {
     ),
   ];
 
+  List<Product> get favoriteProducts {
+    return _products.where((element) => element.isFavorite).toList();
+  }
+
   // The reason why we use a getter to return the list is because
   // Everything is passed in by reference, which can change the original List
   // But using a getter will only give us the values rather then pointer reference
-  List<Product> get products {
+  List<Product> get getProducts {
     return [..._products];
+  }
+
+  Product findByID(String id) {
+    return _products.firstWhere((element) => element.id == id);
   }
 
   /// Adds a new product to the list
