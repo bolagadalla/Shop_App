@@ -1,6 +1,9 @@
-import 'package:flutter/material.dart';
-
+import 'dart:convert';
 import 'product.dart';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import '../models/http_exceptions.dart';
 
 // The ChangeNotifier is in charge of notifying listers when data has changed
 // The lister must be at the highest point of the widget tree where you will start listening for new data
@@ -8,38 +11,15 @@ import 'product.dart';
 // In this case it must be the main.dart because we are using it int eh product_overview_screen.dart
 class ProductsProvider with ChangeNotifier {
   List<Product> _products = [
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl:
-          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-    ),
-    Product(
-      id: 'p4',
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
+    // Product(
+    //   id: 'p1',
+    //   title: '',
+    //   description: '',
+    //   price: 29.99,
+    //   imageUrl:
+    //       '',
+    // )
+
   ];
 
   List<Product> get favoriteProducts {
@@ -57,32 +37,116 @@ class ProductsProvider with ChangeNotifier {
     return _products.firstWhere((element) => element.id == id);
   }
 
-  /// Adds a new product to the list
-  void addProduct(Product product) {
-    final newProduct = Product(
-      id: DateTime.now().toString(),
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-    );
-    _products.add(newProduct);
-    // This is to be called at the end to notify listers that new data is avaliable
-    // That also causes the widget that has the lister to rebuild itself
-    notifyListeners();
+  Future<void> fetchAndSetProducts() async {
+    const url =
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/products.json";
+    try {
+      final response = await http.get(url);
+      final extractedDate = json.decode(response.body) as Map<String, dynamic>;
+      final List<Product> loadedProducts = [];
+      extractedDate.forEach(
+        (prodID, prodData) {
+          loadedProducts.add(
+            Product(
+              id: prodID,
+              title: prodData["title"],
+              description: prodData["description"],
+              price: prodData["price"],
+              imageUrl: prodData["imageUrl"],
+              isFavorite: prodData["isFavorite"],
+            ),
+          );
+        },
+      );
+      _products = loadedProducts;
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
-  void updateProduct(String id, Product newProduct) {
+  /// Adds a new product to the list
+  /// "async" will wrap our code and return it as a "Future" object
+  /// Thats why we are not returning anything
+  Future<void> addProduct(Product product) async {
+    const url =
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/products.json";
+    // try catch only works on syncrnous code
+    // Since this is written like syncrnous code, we can use it here
+    try {
+      // Since http.post return a response, we store that into a variable
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            "title": product.title,
+            "description": product.description,
+            "imageUrl": product.imageUrl,
+            "price": product.price,
+            "isFavorite": product.isFavorite,
+          },
+        ),
+      );
+      // This is put into an "invisible" ".then()" function
+      final newProduct = Product(
+        id: json.decode(response.body)["name"],
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+      );
+      _products.add(newProduct);
+      // This is to be called at the end to notify listers that new data is avaliable
+      // That also causes the widget that has the lister to rebuild itself
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+    // We throw this error here because we are handling errors in the "edit_product_screen.dart"
+    // This just throws the error unto the upcoming "catchError" method
+    // throw error;
+  }
+
+  Future<void> updateProduct(String id, Product newProduct) async {
     final productIndex = _products.indexWhere((prod) => prod.id == id);
     if (productIndex >= 0) {
-      _products[productIndex] = newProduct;
-      notifyListeners();
+      final url =
+          "https://shop-app-f4370-default-rtdb.firebaseio.com/products/$id.json";
+      try {
+        await http.patch(
+          url,
+          body: json.encode(
+            {
+              "title": newProduct.title,
+              "description": newProduct.description,
+              "imageUrl": newProduct.imageUrl,
+              "price": newProduct.price,
+            },
+          ),
+        );
+        _products[productIndex] = newProduct;
+        notifyListeners();
+      } catch (error) {}
     } else
       print("...");
   }
 
-  void deleteProduct(String id) {
-    _products.removeWhere((element) => element.id == id);
+  Future<void> deleteProduct(String id) async {
+    final url =
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/products/$id.json";
+    final existingProductIndex =
+        _products.indexWhere((element) => element.id == id);
+    Product existingProduct = _products[existingProductIndex];
+    _products.removeAt(existingProductIndex);
     notifyListeners();
+    // If we could not delete it, then we role back and put the product back into the list
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      // Role back if we could not delete it
+      _products.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException("Could not delete product.");
+    }
+    existingProduct = null;
   }
 }

@@ -4,8 +4,9 @@ import 'package:provider/provider.dart';
 import '../widgets/products_grid.dart';
 import '../widgets/badge.dart';
 import '../widgets/app_drawer.dart';
-import '../providers/cart.dart';
 import '../screens/cart_screen.dart';
+import '../providers/cart.dart';
+import '../providers/products_provider.dart';
 
 enum FilterOptions {
   Only_Favorites,
@@ -21,6 +22,42 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   bool _showOnlyFavorites = false;
+  bool _isInit = true;
+  bool _isLoading = false;
+  // Runs once at the start of the app
+  @override
+  void initState() {
+    // This will not work because we dont have access to ".of(context)" in initState
+    // Provider.of<ProductsProvider>(context).fetchAndSetProducts();
+
+    // This will work because this will be in the "Future"
+    // Future.delayed(Duration.zero).then(
+    //   (value) {
+    //     Provider.of<ProductsProvider>(context).fetchAndSetProducts();
+    //   },
+    // );
+    super.initState();
+  }
+
+  // Runs after the widgets have been fully initialized but before the widget renders
+  // This can run multiple times, so have a helper flag to check if it already ran "_isInit"
+  @override // Dont use async here, dont change what they return
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<ProductsProvider>(context).fetchAndSetProducts().then(
+        (value) {
+          setState(() {
+            _isLoading = false;
+          });
+        },
+      );
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +116,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
       ),
       drawer: AppDrawer(),
       backgroundColor: Color.fromRGBO(250, 250, 250, 1),
-      body: ProductsGrid(_showOnlyFavorites),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavorites),
     );
   }
 }

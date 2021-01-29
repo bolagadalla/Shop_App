@@ -161,23 +161,31 @@ class ProductItem extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0, 0),
-              child: Text(
-                product.title,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
+              child: FittedBox(
+                child: SizedBox(
+                  width: 190,
+                  child: Text(
+                    product.title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0, 0),
-              child: Text(
-                "\$${product.price.toStringAsFixed(2)}",
-                style: TextStyle(
-                  color: _theme.primaryColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
+              child: FittedBox(
+                child: Text(
+                  "\$${product.price.toStringAsFixed(2)}",
+                  style: TextStyle(
+                    color: _theme.primaryColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ),
