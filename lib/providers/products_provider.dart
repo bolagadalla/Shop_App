@@ -19,7 +19,6 @@ class ProductsProvider with ChangeNotifier {
     //   imageUrl:
     //       '',
     // )
-
   ];
 
   List<Product> get favoriteProducts {
@@ -42,9 +41,11 @@ class ProductsProvider with ChangeNotifier {
         "https://shop-app-f4370-default-rtdb.firebaseio.com/products.json";
     try {
       final response = await http.get(url);
-      final extractedDate = json.decode(response.body) as Map<String, dynamic>;
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      // This would mean we dont have any thing in that database
+      if (extractedData == null) return;
       final List<Product> loadedProducts = [];
-      extractedDate.forEach(
+      extractedData.forEach(
         (prodID, prodData) {
           loadedProducts.add(
             Product(
