@@ -1,4 +1,6 @@
+import 'package:Shop_App/providers/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/orders_screen.dart';
 import '../screens/user_products_screen.dart';
@@ -32,6 +34,18 @@ class AppDrawer extends StatelessWidget {
             title: Text("Managa Products"),
             onTap: () => Navigator.of(context)
                 .pushReplacementNamed(UserProductsScreen.routeName),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text("Log Out"),
+            onTap: () {
+              // Closes the drawer before we log out
+              // Quickly changing between screens causes errors
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacementNamed("/");
+              Provider.of<Auth>(context, listen: false).logout();
+            },
           ),
         ],
       ),

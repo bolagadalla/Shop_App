@@ -8,6 +8,7 @@ import './screens/user_products_screen.dart';
 import './screens/orders_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/auth_screen.dart';
+import './screens/splash_screen.dart';
 
 import './providers/products_provider.dart';
 import './providers/cart.dart';
@@ -29,10 +30,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (ctx) => Auth()),
         ChangeNotifierProxyProvider<Auth, ProductsProvider>(
           update: (ctx, auth, previousProducts) => ProductsProvider(
-            auth.token,
-            previousProducts == null ? [] : previousProducts.getProducts,
-            auth.userID
-          ),
+              auth.token,
+              previousProducts == null ? [] : previousProducts.getProducts,
+              auth.userID),
         ),
         // Must provide a new instance of the provider class
         // All child widgets on the tree can have access to this provider
@@ -42,6 +42,7 @@ class MyApp extends StatelessWidget {
           update: (ctx, auth, previousOrders) => Orders(
             auth.token,
             previousOrders == null ? [] : previousOrders.orders,
+            auth.userID,
           ),
         ),
       ],
@@ -54,7 +55,17 @@ class MyApp extends StatelessWidget {
             accentColor: Color.fromRGBO(45, 97, 135, 1),
             fontFamily: "Lato",
           ),
-          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+          home: auth.isAuth
+              ? ProductsOverviewScreen()
+              // We create a FutureBuilder that would run "tryAutoLogin" to try and log in the user
+              // if their token havent expired yet
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (ctx, snapShot) =>
+                      snapShot.connectionState == ConnectionState.waiting
+                          ? SplashScreen()
+                          : AuthScreen(),
+                ),
           routes: {
             ProductDetailsScreen.routeName: (ctx) => ProductDetailsScreen(),
             CartScreen.routeName: (ctx) => CartScreen(),

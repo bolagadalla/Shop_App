@@ -34,9 +34,9 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> fetchAndSetProducts([bool filteruser = false]) async {
     final filterString =
-        filteruser ? "orderBy='creatorID'&equalTo=$userID" : "";
+        filteruser ? '&orderBy="creatorID"&equalTo=$userID' : '';
     var url =
-        "https://shop-app-f4370-default-rtdb.firebaseio.com/products.json?auth=$currentUserToken&$filterString";
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/products.json?auth=$currentUserToken$filterString";
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -47,9 +47,7 @@ class ProductsProvider with ChangeNotifier {
       url =
           "https://shop-app-f4370-default-rtdb.firebaseio.com/userFavorites/$userID.json?auth=$currentUserToken";
       final favoriteResponce = await http.get(url);
-      final extractedFavoriteStatus =
-          json.decode(favoriteResponce.body) as Map<String, String>;
-
+      final extractedFavoriteStatus = json.decode(favoriteResponce.body);
       final List<Product> loadedProducts = [];
       extractedData.forEach(
         (prodID, prodData) {
@@ -63,7 +61,7 @@ class ProductsProvider with ChangeNotifier {
               // variable ?? means if the variable is null, it will fallback to the value given after the "variable", otherwise it will assign the value of the "variable"
               isFavorite: extractedFavoriteStatus == null
                   ? false
-                  : extractedFavoriteStatus[prodID] ?? false,
+                  : extractedFavoriteStatus[prodID]["isFavorite"] ?? false,
             ),
           );
         },

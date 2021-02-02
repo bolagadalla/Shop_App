@@ -26,7 +26,8 @@ class Product with ChangeNotifier {
   }
 
   // Toggle the favoirte property
-  Future<void> toggleFavoriteStatus(String currentUserToken, String userID) async {
+  Future<void> toggleFavoriteStatus(
+      String currentUserToken, String userID) async {
     final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
@@ -40,7 +41,9 @@ class Product with ChangeNotifier {
       final response = await http.put(
         url,
         body: json.encode(
-          isFavorite,
+          {
+            "isFavorite": isFavorite,
+          },
         ),
       );
       if (response.statusCode >= 400) {

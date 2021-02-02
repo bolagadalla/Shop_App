@@ -23,7 +23,8 @@ class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
 
   final String currentUserToken;
-  Orders(this.currentUserToken, this._orders);
+  final String userID;
+  Orders(this.currentUserToken, this._orders, this.userID);
 
   List<OrderItem> get orders {
     return _orders;
@@ -31,7 +32,7 @@ class Orders with ChangeNotifier {
 
   Future<void> fetchAndSetOrders() async {
     final url =
-        "https://shop-app-f4370-default-rtdb.firebaseio.com/orders.json?auth=$currentUserToken";
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/orders/$userID.json?auth=$currentUserToken";
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -72,7 +73,7 @@ class Orders with ChangeNotifier {
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final url =
-        "https://shop-app-f4370-default-rtdb.firebaseio.com/orders.json?auth=$currentUserToken";
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/orders/$userID.json?auth=$currentUserToken";
     final timeStamp = DateTime.now();
     // try catch only works on syncrnous code
     // Since this is written like syncrnous code, we can use it here
@@ -82,6 +83,7 @@ class Orders with ChangeNotifier {
         url,
         body: json.encode(
           {
+            "userID": userID,
             "amount": total,
             "dateTime": timeStamp.toIso8601String(),
             "products": cartProducts
