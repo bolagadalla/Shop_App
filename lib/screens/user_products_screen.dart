@@ -11,12 +11,12 @@ class UserProductsScreen extends StatelessWidget {
 
   Future<void> _refreshProducts(BuildContext context) async {
     await Provider.of<ProductsProvider>(context, listen: false)
-        .fetchAndSetProducts();
+        .fetchAndSetProducts(true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final productsDate = Provider.of<ProductsProvider>(context);
+    // final productsDate = Provider.of<ProductsProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Your Products"),
@@ -30,24 +30,32 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () => _refreshProducts(context),
-        child: Padding(
-          padding: EdgeInsets.all(8),
-          child: ListView.builder(
-            itemCount: productsDate.getProducts.length,
-            itemBuilder: (_, index) => Column(
-              children: [
-                UserProductItem(
-                  id: productsDate.getProducts[index].id,
-                  title: productsDate.getProducts[index].title,
-                  imageURL: productsDate.getProducts[index].imageUrl,
+      body: FutureBuilder(
+        future: _refreshProducts(context),
+        builder: (ctx, snapShot) => snapShot.connectionState ==
+                ConnectionState.waiting
+            ? Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: () => _refreshProducts(context),
+                child: Consumer<ProductsProvider>(
+                  builder: (ctx, productsData, _) => Padding(
+                    padding: EdgeInsets.all(8),
+                    child: ListView.builder(
+                      itemCount: productsData.getProducts.length,
+                      itemBuilder: (_, index) => Column(
+                        children: [
+                          UserProductItem(
+                            id: productsData.getProducts[index].id,
+                            title: productsData.getProducts[index].title,
+                            imageURL: productsData.getProducts[index].imageUrl,
+                          ),
+                          Divider(),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                Divider(),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }

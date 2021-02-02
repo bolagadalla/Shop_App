@@ -11,15 +11,22 @@ Creating a shop app with products and products categories. Also creating shoppin
     - [x] Input Validation
     - [x] Add Products
     - [x] Edit Products
-    - [ ] Storing Data & HTTP
-    - [ ] Sending HTTP Request (Store + Fetch Data)
-    - [ ] Showing Loading Progress
-    - [ ] Handling Errors
+    - [x] Storing Data & HTTP
+    - [x] Sending HTTP Request (Store + Fetch Data)
+    - [x] Showing Loading Progress
+    - [x] Handling Errors
+    - [x] Create Login/Sign Up Screen
+    - [x] Register and Authenticate Users
+    - [x] Have Data to Only Relate to Currently Loggedin User
+    - [ ] Persistant Login For Users
 	
 ## How The App Looks
 <p align="center">
-  <img src="https://github.com/bolagadalla/Shop_App/blob/main/assets/images/Screenshot_1.png?raw=true" width="350" title="App Screenshot 1">
+  <img src="https://github.com/bolagadalla/Shop_App/blob/main/assets/images/Screenshot_3.png?raw=true" width="350" title="App Screenshot 1">
 </p>
 <p align="center">
-  <img src="https://github.com/bolagadalla/Shop_App/blob/main/assets/images/Screenshot_2.png?raw=true" width="350" title="App Screenshot 1">
+  <img src="https://github.com/bolagadalla/Shop_App/blob/main/assets/images/Screenshot_1.png?raw=true" width="350" title="App Screenshot 2">
+</p>
+<p align="center">
+  <img src="https://github.com/bolagadalla/Shop_App/blob/main/assets/images/Screenshot_2.png?raw=true" width="350" title="App Screenshot 3">
 </p>

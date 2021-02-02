@@ -26,17 +26,21 @@ class Product with ChangeNotifier {
   }
 
   // Toggle the favoirte property
-  Future<void> toggleFavoriteStatus() async {
+  Future<void> toggleFavoriteStatus(String currentUserToken, String userID) async {
     final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
+    // userFavorites folder/userID/productID
+    // This means there will be a userFavorite folder which will contain all the userID
+    // That marks a product as favorite (only). with in that userID folder
+    // There will be all the products that they marked as favorite
     final url =
-        "https://shop-app-f4370-default-rtdb.firebaseio.com/products/$id.json";
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/userFavorites/$userID/$id.json?auth=$currentUserToken";
     try {
-      final response = await http.patch(
+      final response = await http.put(
         url,
         body: json.encode(
-          {"isFavorite": isFavorite},
+          isFavorite,
         ),
       );
       if (response.statusCode >= 400) {

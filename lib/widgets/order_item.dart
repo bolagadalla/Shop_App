@@ -23,7 +23,7 @@ class _OrderItemState extends State<OrderItem> {
       child: Column(
         children: [
           ListTile(
-            title: Text("\$${widget.orderItem.amount}"),
+            title: Text("\$${widget.orderItem.amount.toStringAsFixed(2)}"),
             subtitle: Text(
               DateFormat("dd/MM/yyyy-hh:mm").format(widget.orderItem.dateTime),
             ),
@@ -41,24 +41,33 @@ class _OrderItemState extends State<OrderItem> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
               // base height of 100
-              height: min(widget.orderItem.products.length * 20.0 + 10.0, 100),
+              height: min(widget.orderItem.products.length * 20.0 + 50.0, 100),
               child: ListView(
                 children: widget.orderItem.products
                     .map(
-                      (e) => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      (e) => Column(
                         children: [
-                          Text(
-                            e.title,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                child: Text(
+                                  e.title,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                "${e.quantity}x \$${e.price}",
+                                style:
+                                    TextStyle(fontSize: 18, color: Colors.grey),
+                              )
+                            ],
                           ),
-                          Text(
-                            "${e.quantity}x \$${e.price}",
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          )
+                          Divider(),
                         ],
                       ),
                     )

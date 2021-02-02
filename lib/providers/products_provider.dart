@@ -10,16 +10,12 @@ import '../models/http_exceptions.dart';
 // Also so it can be passed down the tree
 // In this case it must be the main.dart because we are using it int eh product_overview_screen.dart
 class ProductsProvider with ChangeNotifier {
-  List<Product> _products = [
-    // Product(
-    //   id: 'p1',
-    //   title: '',
-    //   description: '',
-    //   price: 29.99,
-    //   imageUrl:
-    //       '',
-    // )
-  ];
+  List<Product> _products = [];
+
+  final String currentUserToken;
+  final String userID;
+
+  ProductsProvider(this.currentUserToken, this._products, this.userID);
 
   List<Product> get favoriteProducts {
     return _products.where((element) => element.isFavorite).toList();
@@ -36,14 +32,24 @@ class ProductsProvider with ChangeNotifier {
     return _products.firstWhere((element) => element.id == id);
   }
 
-  Future<void> fetchAndSetProducts() async {
-    const url =
-        "https://shop-app-f4370-default-rtdb.firebaseio.com/products.json";
+  Future<void> fetchAndSetProducts([bool filteruser = false]) async {
+    final filterString =
+        filteruser ? "orderBy='creatorID'&equalTo=$userID" : "";
+    var url =
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/products.json?auth=$currentUserToken&$filterString";
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       // This would mean we dont have any thing in that database
       if (extractedData == null) return;
+
+      // Getting the product Favorite Status
+      url =
+          "https://shop-app-f4370-default-rtdb.firebaseio.com/userFavorites/$userID.json?auth=$currentUserToken";
+      final favoriteResponce = await http.get(url);
+      final extractedFavoriteStatus =
+          json.decode(favoriteResponce.body) as Map<String, String>;
+
       final List<Product> loadedProducts = [];
       extractedData.forEach(
         (prodID, prodData) {
@@ -54,7 +60,10 @@ class ProductsProvider with ChangeNotifier {
               description: prodData["description"],
               price: prodData["price"],
               imageUrl: prodData["imageUrl"],
-              isFavorite: prodData["isFavorite"],
+              // variable ?? means if the variable is null, it will fallback to the value given after the "variable", otherwise it will assign the value of the "variable"
+              isFavorite: extractedFavoriteStatus == null
+                  ? false
+                  : extractedFavoriteStatus[prodID] ?? false,
             ),
           );
         },
@@ -70,8 +79,8 @@ class ProductsProvider with ChangeNotifier {
   /// "async" will wrap our code and return it as a "Future" object
   /// Thats why we are not returning anything
   Future<void> addProduct(Product product) async {
-    const url =
-        "https://shop-app-f4370-default-rtdb.firebaseio.com/products.json";
+    final url =
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/products.json?auth=$currentUserToken";
     // try catch only works on syncrnous code
     // Since this is written like syncrnous code, we can use it here
     try {
@@ -84,7 +93,7 @@ class ProductsProvider with ChangeNotifier {
             "description": product.description,
             "imageUrl": product.imageUrl,
             "price": product.price,
-            "isFavorite": product.isFavorite,
+            "creatorID": userID,
           },
         ),
       );
@@ -112,7 +121,7 @@ class ProductsProvider with ChangeNotifier {
     final productIndex = _products.indexWhere((prod) => prod.id == id);
     if (productIndex >= 0) {
       final url =
-          "https://shop-app-f4370-default-rtdb.firebaseio.com/products/$id.json";
+          "https://shop-app-f4370-default-rtdb.firebaseio.com/products/$id.json?auth=$currentUserToken";
       try {
         await http.patch(
           url,
@@ -134,7 +143,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     final url =
-        "https://shop-app-f4370-default-rtdb.firebaseio.com/products/$id.json";
+        "https://shop-app-f4370-default-rtdb.firebaseio.com/products/$id.json?auth=$currentUserToken";
     final existingProductIndex =
         _products.indexWhere((element) => element.id == id);
     Product existingProduct = _products[existingProductIndex];
