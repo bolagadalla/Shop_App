@@ -60,11 +60,16 @@ class ProductItem extends StatelessWidget {
               ),
               child: Stack(
                 children: [
-                  Image.network(
-                    product.imageUrl,
-                    height: 250,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+                  Hero(
+                    tag: product.id,
+                    child: FadeInImage(
+                      placeholder:
+                          AssetImage("assets/images/product-placeholder.png"),
+                      image: NetworkImage(product.imageUrl),
+                      fit: BoxFit.cover,
+                      height: 250,
+                      width: double.infinity,
+                    ),
                   ),
                   // The Add To Cart Button
                   Container(

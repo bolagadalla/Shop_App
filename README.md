@@ -19,8 +19,8 @@ Creating a shop app with products and products categories. Also creating shoppin
     - [x] Register and Authenticate Users
     - [x] Have Data to Only Relate to Currently Loggedin User
     - [x] Persistant Login For Users
-    - [ ] Different Ways of Animating Widgets
-    - [ ] Custom Animations & Built-in Animations/Helpers
+    - [x] Different Ways of Animating Widgets
+    - [x] Custom Animations & Built-in Animations/Helpers
 	
 ## How The App Looks
 <p align="center">

@@ -14,20 +14,20 @@ class ProductDetailsScreen extends StatelessWidget {
     // This is helpful when we dont need to rebuild a widget rather we just want data only
     final loadedProduct = Provider.of<ProductsProvider>(context, listen: false)
         .findByID(productID);
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text(loadedProduct.title)),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.share,
-              color: Colors.white,
-            ),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: ProductDetail(loadedProduct),
-    );
+    return //Scaffold(
+        // appBar: AppBar(
+        //   title: Center(child: Text(loadedProduct.title)),
+        //   actions: [
+        //     IconButton(
+        //       icon: Icon(
+        //         Icons.share,
+        //         color: Colors.white,
+        //       ),
+        //       onPressed: () {},
+        //     ),
+        //   ],
+        // ),
+        //body:
+        ProductDetail(loadedProduct);
   }
 }
