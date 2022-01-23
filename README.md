@@ -1,4 +1,4 @@
-# Personal Expenses App
+# Shop App
 
 Creating a shop app with products and products categories. Also creating shopping cart and adding and removing products from the shopping cart. Plus, learning about managing state more efficiently and preventing unnessecery drawing.
 
